@@ -1,0 +1,41 @@
+---
+title: "Tarea_DBT845"
+author: "Paula Valenzuela"
+date: "21-04-2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(readr)
+library(survival)
+library(ggplot2)
+library(survminer)
+library(dplyr)
+library(tidyr)
+library(psych)
+library(lmtest)
+library(knitr)
+library(car)
+library(stats)
+library(multcompView)
+library(grid)
+library(gridExtra)
+library(cowplot)
+library(PerformanceAnalytics)
+library(onewaytests)
+library(nlme)
+library(lsmeans)
+library(coefplot)
+library(corrplot)
+library(lme4)
+library(ggpubr)
+library(rstatix)
+```
+
+# Set de datos PIE
+```{r}
+PIE <- read_excel("BD_PIE.xlsx")
+```
+
