@@ -12,6 +12,6 @@ Análisis de datos de eventos de esmoltificación y estrés proporcionados por e
 a) Base de datos descriptiva de los Fenotipos de los salmonidos 
 | Variables de estudio| Variables descriptivas| N° total observaciones|
 | ----------|------------|---------|
-| Peso (g) y Longitud| Centro|120 peces|
-|---------| Tanque|120 peces|
-|--------|Programa|120 peces|
+| Peso (g) y Longitud (cm)| Centro|120 peces|
+|                         | Tanque|120 peces|
+|                         |Programa|120 peces|
