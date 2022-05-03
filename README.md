@@ -15,3 +15,9 @@ a) Base de datos descriptiva de los Fenotipos de los salmonidos
 | Peso (g) y Longitud (cm)| Centro|120 peces|
 |                         | Tanque|120 peces|
 |                         |Programa|120 peces|
+
+b) Base de datos descriptiva de cuantificación y absorbancia de RNA de organos Músculo, Riñon anterior, Bazo y Branquias. 
+| Variable de estudios| Varibales descriptivas| N° total observaciones|
+|-----------|-----------|-------------|
+|Concentracion de RNA| Músculo, Branquias, Riñon anterior, Bazo| 600 muestras|
+| Absorbancia (260/280)| Músculo, Branquias, Riñon anterior| Bazo| 600 muestras|
