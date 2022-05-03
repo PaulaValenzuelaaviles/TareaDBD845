@@ -293,7 +293,6 @@ k<- RNA_pool_e %>%
 j
 k
 ```
-
 ## individual correlation esmoltifación
 
 ```{r, warning=FALSE}
@@ -322,59 +321,49 @@ CT_gene_e$Time<- as.factor(CT_gene_e$Time)
 head(CT_gene_e)
 
 ```
-
 # Delete outliers smoltification
 
 2 pools of samples were eliminated due to low quality 260/280.
 
 ```{r}
 dim(CT_gene_e)
-CT_gene_e <-subset(CT_gene_e, Pool!="RER15_5_6_15_16" & Pool!="REQ30_7_8_17_8")   
+CT_gene_e <-subset(CT_gene_e, Pool!="RER15_5_6_15_16" & Pool!="REQ30_7_8_17_8" )   
 dim(CT_gene_e)
 ```
 
 # Exploratorio de ct gen elf 
 
 ```{r}
-ct_his_elf <- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=ct))+
-  geom_histogram(color="darkblue", fill="lightblue", bins=10)
-ct_his_elf
+ct_his_elf_e <- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=ct))+  geom_histogram(color="darkblue", fill="lightblue", bins=10)
+ct_his_elf_e
 
+ct_gene_e <- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=Gene, y= ct))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  coord_flip()
+ct_gene_e
 
-ct_elf <- ggplot(CT_gene_e, aes(Tissue, ct))+
-  geom_boxplot(aes(fill=Treatment))
+ct_tissue<- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=Tissue, y= ct))+
+  geom_boxplot()+scale_x_discrete(labels = c('Gill','HK','M',"S"))+
+  facet_wrap(~ Gene,scales = "free")
+ct_tissue
+  
+ct_gene_tissue <- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=Time, y= ct))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")
+ct_gene_tissue    
 
-ct_elf
-
-ct_elf <- ggplot(CT_gene_e, aes(Program, ct))+
-  geom_boxplot(aes(fill=Treatment))+
-  facet_wrap(~ Tissue)
-
-ct_elf
-
-ct_elf <- ggplot(CT_gene_e, aes(fill=Time, x=Tissue, y=ct))+
-  geom_boxplot(aes(fill=Time))+
-  facet_wrap(~ Program)
-
-ct_elf
 ```
 
-# Identificando elf outliers
+# ELIMINADO OUTLIERS elf outliers
 
-```{r}
-CT_gene_e$Pool<- as.factor(CT_gene_e$Pool)
-gill_out <- CT_gene_e %>% filter(Tissue== "Gills", elf >= 20)
-
-head(gill_out) %>% kable(caption = "Outliers Gills elf > = 20")
-```
-
-# Eliminando outliers elf
+## **El pool REB15_7_8_17_8 tiene un valor de elf imposible: dice 25.17**
 
 ```{r}
 dim(CT_gene_e)
-CT_gene_e <-subset(CT_gene_e, Pool!="" & Pool!="")
+CT_gene_e <-subset(CT_gene_e, Pool!="REB15_7_8_17_8" )   
 dim(CT_gene_e)
 ```
+
 
 ## Exploratory ct gene
 
@@ -482,7 +471,7 @@ Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -21]
 
 # TIFF HK correlation
 tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
-chart.Correlation(Cor_ct_gene_HK_e[, 6:18], histogram=FALSE, pch=19, method = c("spearman"))
+chart.Correlation(Cor_ct_gene_HK_e[, 7:21], histogram=FALSE, pch=19, method = c("spearman"))
 mtext("Correlacion expresión de genes Riñon (CT)", side=3, line=3)
 # Close device
 dev.off()
