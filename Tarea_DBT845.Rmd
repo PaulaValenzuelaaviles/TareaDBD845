@@ -1,8 +1,16 @@
 ---
 title: "Tarea_DBT845"
 author: "Paula Valenzuela"
-date: "21-04-2022"
-output: html_document
+affiliation: Pontificia Universidad Católica de Valparaíso.
+ email: <paula.valenzuela.aviles@gmail.com>
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
 ---
 
 ```{r setup, include=FALSE}
@@ -36,6 +44,275 @@ library(rstatix)
 
 # Set de datos PIE
 ```{r}
-PIE <- read_excel("BD_PIE.xlsx")
+pheno_e <- read_excel("BD_esmoltificación.xlsx", sheet = 1)
 ```
+
+# Transformar a factor o numeric
+
+```{r}
+pheno_e$Animal<-as.factor(pheno_e$Animal)
+pheno_e$Center<-as.factor(pheno_e$Center)
+pheno_e$Treatment<-as.factor(pheno_e$Treatment)
+pheno_e$Program<-as.factor(pheno_e$Program)
+pheno_e$Sampling<-as.factor(pheno_e$Sampling)
+pheno_e$Sex<-as.factor(pheno_e$Sex)
+pheno_e$Tank<-as.factor(pheno_e$Tank)
+pheno_e$Experiment<- as.factor(pheno_e$Experiment)
+pheno_e$Species<- as.factor(pheno_e$Species)
+pheno_e$Muscle<-as.factor(pheno_e$Muscle)
+pheno_e$Spleen<-as.factor(pheno_e$Spleen)
+pheno_e$Gills<-as.factor(pheno_e$Gills)
+pheno_e$Serum<-as.factor(pheno_e$Serum)
+pheno_e$`Head Kidney`<-as.factor(pheno_e$`Head Kidney`)
+summary(pheno_e)
+```
+# Frecuencia 
+
+```{r}
+table(pheno_e$Center, pheno_e$Sex)
+table(pheno_e$Center, pheno_e$Program)
+table(pheno_e$Program, pheno_e$Tank)
+table(pheno_e$Treatment, pheno_e$Sex)
+```
+
+# Histograma de Longitud y peso de los salomindos
+
+```{r}
+pheno_e %>%
+  ggplot(aes(x= `Weight (g)`)) +
+  geom_histogram(col="darkblue", fill= "lightblue", position = "identity", bins = 10, alpha = 0.4 )+ labs(x="Body Weight (g)", title = " Weight (g)") 
+
+pheno_e %>%
+  ggplot(aes(x= `Long (cm)`)) +
+  geom_histogram(col="darkgreen", fill= "green", position = "identity", bins = 10, alpha = 0.4 )+ labs(x=" Body Length(cm)", title = "Length(cm) ")
+```
+# Boxplot
+
+```{r, warning=FALSE}
+
+a<- pheno_e %>%
+  ggplot(aes(x=Center, y= `Weight (g)`, fill=Center)) +
+  geom_boxplot() +
+  labs(y="Body weight (g)", x="Center", 
+       subtitle="Body weight variation by Center")
+
+
+b<- pheno_e %>%
+  ggplot(aes(x=Program, y=`Weight (g)`, fill=Program)) +
+  geom_boxplot() +
+  labs(y="Body weight (g)", x="Program", 
+       subtitle="Body weight variation by Program")
+
+c<- pheno_e %>%
+  ggplot(aes(x=Tank, y=`Weight (g)`, fill=Tank)) +
+  geom_boxplot() +
+  labs(y="Body weight (g)", x="Tank", 
+       subtitle="Body weight variation by Tank") + facet_grid(rows = vars(Program))+ facet_grid(rows = vars(Program))
+
+a
+b
+c
+
+```
+
+# Correlacion individual
+
+```{r, warning=FALSE}
+par(mfrow = c(1, 1))
+
+my_data_e <- pheno_e[, c(16,17)]
+
+head(my_data_e, 6)
+
+chart.Correlation(my_data_e, histogram=FALSE, pch=19, method = c("spearman"))
+
+```
+
+## **Importar y explorar datos de  RNA **
+
+```{r}
+RNA_e <- read_excel("BD_esmoltificación.xlsx", sheet = 2)
+```
+
+```{r}
+RNA_e$Sample <- as.factor (RNA_e$Sample)
+RNA_e$Animal<-as.factor(RNA_e$Animal)
+RNA_e$Treatment<-as.factor(RNA_e$Treatment)
+RNA_e$Program<-as.factor(RNA_e$Program)
+RNA_e$Tissue<-as.factor(RNA_e$Tissue)
+RNA_e$Time<-as.factor(RNA_e$Time)
+RNA_e$`Individual RNA  (ng/µl)`<- as.numeric(RNA_e$`Individual RNA  (ng/µl)`)
+RNA_e$`Individual absorbance`<- as.numeric(RNA_e$`Individual absorbance`)
+
+
+colnames(RNA_e)[7] <- "Individual RNA (ng/µl)"
+colnames(RNA_e)[8] <- "Individual absorbance"
+
+summary(RNA_e)
+```
+# Histograma
+
+```{r}
+RNA_e %>%
+  ggplot(aes(x= `Individual RNA (ng/µl)`)) +
+  geom_histogram(col="darkblue", fill= "lightblue", position = "identity", bins = 10, alpha = 0.4 )+ labs(x="RNA (ug/ul)", title = "Concentration RNA") 
+
+RNA_e %>%
+  ggplot(aes(x= `Individual absorbance`)) +
+  geom_histogram(col="darkgreen", fill= "green", position = "identity", bins = 10, alpha = 0.4 )+ labs(x="Absorbance (260/280)", title ="Absorbance RNA" )
+```
+# Bloxplot
+
+```{r, warning=FALSE}
+
+d<- RNA_e %>%
+  ggplot(aes(x=Program, y=`Individual RNA (ng/µl)`, fill=Program)) +
+  geom_boxplot() +
+  labs(y="Concentración RNA (ng/ul)", x="Programa", 
+       subtitle="RNA Concentration  variation by Program")
+
+
+ e <- RNA_e%>% ggplot(aes(x=Program, y= `Individual absorbance`, fill=Program))+ geom_boxplot() +
+  labs(y="RNA Absorbance A260/A280", x="Program", 
+       subtitle="RNA Absorbance  variation by Program")
+
+ # tejidos 
+ f<- RNA_e %>%
+  ggplot(aes(x=Tissue, y= `Individual RNA (ng/µl)`, fill=Tissue)) +
+  geom_boxplot() +
+  labs(y="Concentración RNA (ng/ul)", x="Tissue", 
+       subtitle="RNA Concentration  variation by Tissue")
+ 
+ g<- RNA_e%>% ggplot(aes(x=Tissue, y= `Individual absorbance`, fill=Tissue))+ geom_boxplot() +
+  labs(y="RNA Absorbance A260/A280", x="Tissue", 
+       subtitle="RNA Absorbance  variation by Tissue")
+ 
+d
+e
+f
+g
+ 
+
+```
+
+# Correlacion individual
+
+```{r, warning=FALSE}
+par(mfrow = c(1, 1))
+
+my_data_es <- RNA_e[, c(7,8)]
+
+head(my_data_es, 6)
+
+chart.Correlation(my_data_es, histogram=FALSE, pch=19, method = c("spearman"))
+
+```
+
+# **Importación y exploración RNA Pool**
+```{r}
+RNA_pool_e <- read_excel("BD_esmoltificación.xlsx", sheet = 3)
+```
+
+# Transformación de factores
+```{r}
+RNA_pool_e$Program<-as.factor(RNA_pool_e$Program)
+RNA_pool_e$Treatment<-as.factor(RNA_pool_e$Treatment)
+RNA_pool_e$Tissue<-as.factor(RNA_pool_e$Tissue)
+RNA_pool_e$Time<-as.factor(RNA_pool_e$Time)
+RNA_pool_e$`Pool RNA (ng/µl)`<-as.numeric(RNA_pool_e$`Pool RNA (ng/µl)`)
+RNA_pool_e$`Pool A260/A280`<-as.numeric(RNA_pool_e$`Pool A260/A280`)
+
+
+colnames(RNA_pool_e)[7] <- "Individual absorbance"
+colnames(RNA_pool_e)[10] <- "Pool absorbance"
+
+summary(RNA_pool_e)
+
+```
+# Histograma
+
+```{r}
+RNA_pool_e %>%
+  ggplot(aes(x= `Pool RNA (ng/µl)`)) +
+  geom_histogram(col="darkblue", fill= "lightblue", position = "identity", bins = 10, alpha = 0.4 )+ labs(x="RNA (ug/ul)", title = "Concentration pool RNA") 
+
+RNA_pool_e %>%
+  ggplot(aes(x= `Individual absorbance`)) +
+  geom_histogram(col="darkgreen", fill= "green", position = "identity", bins = 10, alpha = 0.4 )+ labs(x="Absorbance pool (260/280)", title ="Absorbance pool RNA" )
+```
+
+## boxplot antes y despues de los outliers
+
+```{r}
+# tejidos 
+
+h <- RNA_pool_e %>%
+  ggplot(aes(x=Tissue, y=`Pool RNA (ng/µl)`, fill=Time)) +
+  geom_boxplot() +
+  labs(y="RNA Concentration (ng/ul)", x="Tissue", 
+       subtitle=" RNA concentration variation by Tissue and Time before delete outliers")
+
+i<- RNA_pool_e %>%
+  ggplot(aes(x=Tissue, y=`Individual absorbance`, fill=Time)) +
+  geom_boxplot() +
+  labs(y=" RNA Absorbance  A260/A280", x="Tissue", 
+       subtitle="RNA Absorbance  variation by Tissue before delete outliers")
+
+h
+i
+```
+
+# Identicando outliers 
+
+```{r}
+out_pool0 <- RNA_pool_e %>% filter(`Individual absorbance` >= 2.2)
+out_pool1 <-  RNA_pool_e %>% filter(`Individual absorbance` <= 1.6) 
+
+out_pool <- rbind(out_pool0, out_pool1)
+
+out_pool %>% kable(caption = "Outliers (A260/A280): 1.6 <= Samples >= 2.2")
+```
+
+# Control de calidad sin  outliers 
+
+```{r}
+is.na(RNA_pool_e$`Individual absorbance`) <- RNA_pool_e$`Individual absorbance` >= 2.2
+is.na(RNA_pool_e$`Individual absorbance`) <- RNA_pool_e$`Individual absorbance` <= 1.6
+
+j <- RNA_pool_e %>%
+  ggplot(aes(x=Tissue, y=`Pool RNA (ng/µl)`, fill=Treatment)) +
+  geom_boxplot() +
+  labs(y="RNA Concentration (ng/ul)", x="Tissue", 
+       subtitle=" RNA concentration variation by Tissue and Time after delete outliers")
+
+k<- RNA_pool_e %>%
+  ggplot(aes(x=Tissue, y= `Individual absorbance`, fill=Treatment)) +
+  geom_boxplot() +
+  labs(y=" RNA Absorbance  A260/A280", x="Tissue", 
+       subtitle="RNA Absorbance  variation by Tissue after delete outliers")
+j
+k
+```
+## individual correlation esmoltifación
+
+```{r, warning=FALSE}
+par(mfrow = c(1, 1))
+
+my_data_pool_e <- RNA_pool_e[, c(6,7)]
+
+
+head(my_data_pool_e, 6)
+
+res <- cor(my_data_pool_e, use="complete.obs", method = c("spearman"))
+round(res, 2)
+
+chart.Correlation(my_data_pool_e, histogram=FALSE, pch=19, method = c("spearman"))
+
+```
+
+# **Importar y explorar base de datos CT**
+
+
+
+
 
