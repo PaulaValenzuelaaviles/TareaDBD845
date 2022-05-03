@@ -19,5 +19,7 @@ a) Base de datos descriptiva de los Fenotipos de los salmonidos
 b) Base de datos descriptiva de cuantificación y absorbancia de RNA de organos Músculo, Riñon anterior, Bazo y Branquias. 
 | Variable de estudios| Varibales descriptivas| N° total observaciones|
 |-----------|-----------|-------------|
-|Concentracion de RNA| Músculo, Branquias, Riñon anterior, Bazo| 600 muestras|
-| Absorbancia (260/280)| Músculo, Branquias, Riñon anterior, Bazo| 600 muestras|
+|Concentración de RNA| Programa| 600 muestras|
+|                     | Tejido|    |
+| Absorbancia de RNA (260/280)| Programa| 600 muestras|
+|         | Tejido|    |
