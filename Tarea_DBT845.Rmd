@@ -293,6 +293,7 @@ k<- RNA_pool_e %>%
 j
 k
 ```
+
 ## individual correlation esmoltifación
 
 ```{r, warning=FALSE}
@@ -321,32 +322,39 @@ CT_gene_e$Time<- as.factor(CT_gene_e$Time)
 head(CT_gene_e)
 
 ```
+
 # Delete outliers smoltification
 
 2 pools of samples were eliminated due to low quality 260/280.
 
 ```{r}
 dim(CT_gene_e)
-CT_gene_e <-subset(CT_gene_e, Pool!="RER15_5_6_15_16" & Pool!="REQ30_7_8_17_8	" )   
+CT_gene_e <-subset(CT_gene_e, Pool!="RER15_5_6_15_16" & Pool!="REQ30_7_8_17_8")   
 dim(CT_gene_e)
 ```
 
 # Exploratorio de ct gen elf 
 
 ```{r}
-ct_his_elf <- ggplot(CT_gene_e, aes(x= elf))+
+ct_his_elf <- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=ct))+
   geom_histogram(color="darkblue", fill="lightblue", bins=10)
 ct_his_elf
 
 
-ct_elf <- ggplot(CT_gene_e, aes(Tissue, elf))+
+ct_elf <- ggplot(CT_gene_e, aes(Tissue, ct))+
   geom_boxplot(aes(fill=Treatment))
 
 ct_elf
 
-ct_elf <- ggplot(CT_gene_e, aes(Program, elf))+
+ct_elf <- ggplot(CT_gene_e, aes(Program, ct))+
   geom_boxplot(aes(fill=Treatment))+
   facet_wrap(~ Tissue)
+
+ct_elf
+
+ct_elf <- ggplot(CT_gene_e, aes(fill=Time, x=Tissue, y=ct))+
+  geom_boxplot(aes(fill=Time))+
+  facet_wrap(~ Program)
 
 ct_elf
 ```
@@ -474,7 +482,7 @@ Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -21]
 
 # TIFF HK correlation
 tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
-chart.Correlation(Cor_ct_gene_HK_e[, 7:21], histogram=FALSE, pch=19, method = c("spearman"))
+chart.Correlation(Cor_ct_gene_HK_e[, 6:18], histogram=FALSE, pch=19, method = c("spearman"))
 mtext("Correlacion expresión de genes Riñon (CT)", side=3, line=3)
 # Close device
 dev.off()
