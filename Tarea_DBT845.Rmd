@@ -312,6 +312,231 @@ chart.Correlation(my_data_pool_e, histogram=FALSE, pch=19, method = c("spearman"
 
 # **Importar y explorar base de datos CT**
 
+```{r, warning=FALSE}
+CT_e <- read_excel("BD_esmoltificación.xlsx", sheet = 4)
+CT_gene_e<- tidyr::gather(CT_e, "Gene", "ct", 6:20)
+ 
+CT_gene_e$ct<- as.numeric(CT_gene_e$ct)
+CT_gene_e$Time<- as.factor(CT_gene_e$Time)
+head(CT_gene_e)
+
+```
+# Delete outliers smoltification
+
+2 pools of samples were eliminated due to low quality 260/280.
+
+```{r}
+dim(CT_gene_e)
+CT_gene_e <-subset(CT_gene_e, Pool!="RER15_5_6_15_16" & Pool!="REQ30_7_8_17_8	" )   
+dim(CT_gene_e)
+```
+
+# Exploratorio de ct gen elf 
+
+```{r}
+ct_his_elf <- ggplot(CT_gene_e, aes(x= elf))+
+  geom_histogram(color="darkblue", fill="lightblue", bins=10)
+ct_his_elf
+
+
+ct_elf <- ggplot(CT_gene_e, aes(Tissue, elf))+
+  geom_boxplot(aes(fill=Treatment))
+
+ct_elf
+
+ct_elf <- ggplot(CT_gene_e, aes(Program, elf))+
+  geom_boxplot(aes(fill=Treatment))+
+  facet_wrap(~ Tissue)
+
+ct_elf
+```
+
+# Identificando elf outliers
+
+```{r}
+CT_gene_e$Pool<- as.factor(CT_gene_e$Pool)
+gill_out <- CT_gene_e %>% filter(Tissue== "Gills", elf >= 20)
+
+head(gill_out) %>% kable(caption = "Outliers Gills elf > = 20")
+```
+
+# Eliminando outliers elf
+
+```{r}
+dim(CT_gene_e)
+CT_gene_e <-subset(CT_gene_e, Pool!="" & Pool!="")
+dim(CT_gene_e)
+```
+
+## Exploratory ct gene
+
+```{r}
+ct_his_e <- ggplot(CT_gene_e, aes(x= ct))+
+  geom_histogram(color="darkblue", fill="lightblue", bins=15)+
+  facet_wrap(~ Gene,scales = "free")
+ct_his_e
+
+
+ct_gene_e <- ggplot(CT_gene_e, aes(x=Gene, y= ct))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  coord_flip()
+ct_gene_e
+
+ct_tissue_e<- ggplot(CT_gene_e, aes(x=Tissue, y= ct))+
+  geom_boxplot()+scale_x_discrete(labels = c('Gill','HK','M',"S"))+
+  facet_wrap(~ Gene,scales = "free")
+ct_tissue_e
+
+ct_gene_tissue_e <- ggplot(CT_gene_e, aes(x=Time, y= ct))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")
+ct_gene_tissue_e
+
+#Head kidney
+
+ct_gene_HK_e <- CT_gene_e %>% filter(Tissue == "Head kidney")
+ct_gene_HK_e %>% ggplot(aes(x=Time, y= ct))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")+
+  labs(subtitle="CT by gene - HK")
+
+#Muscule
+
+ct_gene_M_e <- CT_gene_e %>% filter(Tissue == "Muscule") 
+ct_gene_M_e %>% ggplot(aes(x=Time, y= ct))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")+
+  labs(subtitle="CT by gene - Muscule")
+
+#Gills 
+ct_gene_G_e <- CT_gene_e %>% filter(Tissue == "Gills") 
+ct_gene_G_e %>% ggplot(aes(x=Time, y= ct))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")+
+  labs(subtitle="CT by gene - Gills")
+
+#spleen
+ct_gene_S_e <- CT_gene_e %>% filter(Tissue == "Spleen") 
+ct_gene_S_e %>% ggplot(aes(x=Time, y= ct))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")+
+  labs(subtitle="CT by gene - Spleen")
+
+# Head kidney
+
+ct_gene_HK_e$Gene <- as.factor(ct_gene_HK_e$Gene)
+  
+pdf(onefile = TRUE)
+for(i in 1:length(levels(ct_gene_HK_e$Gene))){
+A <-   ggplot(ct_gene_HK_e[ct_gene_HK_e$Gene == levels(ct_gene_HK_e$Gene)[i],], aes(x=Time, y= ct)) + geom_boxplot(color="darkblue", fill="lightblue") + ggtitle(paste0("Expresión de genes en Riñon (CT): ",levels(ct_gene_HK_e$Gene)[i]))
+grid.arrange(A)
+}
+dev.off()
+
+
+#Muscule
+
+ct_gene_M_e$Gene<- as.factor(ct_gene_M_e$Gene)
+
+pdf(onefile = TRUE)
+for(i in 1:length(levels(ct_gene_M_e$Gene))){
+A <-   ggplot(ct_gene_M_e[ct_gene_M_e$Gene == levels(ct_gene_M_e$Gene)[i],], aes(x=Time, y= ct)) + geom_boxplot(color="darkblue", fill="lightblue") + ggtitle(paste0("Expresión de genes en músculo (CT): ",levels(ct_gene_M_e$Gene)[i]))
+grid.arrange(A)
+}
+dev.off()
+
+#Gills
+ct_gene_G_e$Gene<- as.factor(ct_gene_G_e$Gene)
+
+pdf(onefile = TRUE)
+for(i in 1:length(levels(ct_gene_G_e$Gene))){
+A <-   ggplot(ct_gene_G_e[ct_gene_G_e$Gene == levels(ct_gene_G_e$Gene)[i],], aes(x=Time, y= ct)) + geom_boxplot(color="darkblue", fill="lightblue") + ggtitle(paste0("Expresión de genes en Branquia (CT): ",levels(ct_gene_G_e$Gene)[i]))
+grid.arrange(A)
+}
+dev.off()
+
+#Spleen
+ct_gene_S_e$Gene<- as.factor(ct_gene_S_e$Gene)
+
+pdf(onefile = TRUE)
+for(i in 1:length(levels(ct_gene_S_e$Gene))){
+A <-   ggplot(ct_gene_S_e[ct_gene_S_e$Gene == levels(ct_gene_S_e$Gene)[i],], aes(x=Time, y= ct)) + geom_boxplot(color="darkblue", fill="lightblue") + ggtitle(paste0("Expresión de genes en Bazo (CT): ",levels(ct_gene_S_e$Gene)[i]))
+grid.arrange(A)
+}
+dev.off()
+```
+## ct gene correlation
+
+```{r, warning=FALSE}
+Cor_ct_gene_HK_e <- CT_gene_e %>% filter(Tissue == "Head kidney") %>% spread(key = Gene, value = ct)
+Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -9]
+Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -21]
+
+# TIFF HK correlation
+tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+chart.Correlation(Cor_ct_gene_HK_e[, 7:21], histogram=FALSE, pch=19, method = c("spearman"))
+mtext("Correlacion expresión de genes Riñon (CT)", side=3, line=3)
+# Close device
+dev.off()
+
+Cor_ct_gene_M_e <- CT_gene_e %>% filter(Tissue == "Muscule") %>% spread(key = Gene, value = ct)
+Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -10]
+Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -10]
+Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -10]
+Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -13]
+Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -16]
+Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -16]
+Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -16]
+
+
+# TIFF device
+tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+chart.Correlation(Cor_ct_gene_M_e[, 7:16], histogram=FALSE, pch=19, method = c("spearman"))
+mtext("Correlacion expresión de genes Músculo (CT)", side=3, line=3)
+# Close device
+dev.off()
+
+Cor_ct_gene_G_e <- CT_gene_e %>% filter(Tissue == "Gills") %>% spread(key = Gene, value = ct)
+Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -9]
+Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -9]
+Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -9]
+Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -9]
+Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -12]
+Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -15]
+Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -15]
+
+# TIFF device
+tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+chart.Correlation(Cor_ct_gene_G_e[, 7:16], histogram=FALSE, pch=19, method = c("spearman"))
+mtext("Correlacion expresión de genes Branquia (CT)", side=3, line=3)
+# Close device
+dev.off()
+
+Cor_ct_gene_S_e <- CT_gene_e %>% filter(Tissue == "Spleen") %>% spread(key = Gene, value = ct)
+Cor_ct_gene_S_e <- Cor_ct_gene_S_e[, -9]
+Cor_ct_gene_S_e <- Cor_ct_gene_S_e[, -21]
+
+# TIFF device
+tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+chart.Correlation(Cor_ct_gene_S_e[, 7:21], histogram=FALSE, pch=19, method = c("spearman"))
+mtext("Correlacion expresión de genes Bazo (CT)", side=3, line=3)
+# Close device
+dev.off()
+
+```
+
+## Exploratory ct gene REDUCED 
+
+```{r}
+
+```
+
+
+
+
+
+
+
 
 
 
