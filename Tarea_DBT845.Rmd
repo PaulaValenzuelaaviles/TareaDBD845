@@ -337,20 +337,20 @@ dim(CT_gene_e)
 ct_his_elf_e <- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=ct))+  geom_histogram(color="darkblue", fill="lightblue", bins=10)
 ct_his_elf_e
 
-ct_gene_e <- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=Gene, y= ct))+
+ct_gene_elf <- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=Gene, y= ct))+
   geom_boxplot(color="darkblue", fill="lightblue")+
   coord_flip()
-ct_gene_e
+ct_gene_elf
 
-ct_tissue<- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=Tissue, y= ct))+
+ct_tissue_elf<- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=Tissue, y= ct))+
   geom_boxplot()+scale_x_discrete(labels = c('Gill','HK','M',"S"))+
   facet_wrap(~ Gene,scales = "free")
-ct_tissue
+ct_tissue_elf
   
-ct_gene_tissue <- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=Time, y= ct))+
+ct_gene_tissue_elf <- CT_gene_e %>% filter(Gene=="elf") %>% ggplot(aes(x=Time, y= ct))+
   geom_boxplot(color="darkblue", fill="lightblue")+
   facet_wrap(~ Gene,scales = "free")
-ct_gene_tissue    
+ct_gene_tissue_elf    
 
 ```
 
@@ -462,19 +462,20 @@ grid.arrange(A)
 }
 dev.off()
 ```
+
 ## ct gene correlation
 
 ```{r, warning=FALSE}
 Cor_ct_gene_HK_e <- CT_gene_e %>% filter(Tissue == "Head kidney") %>% spread(key = Gene, value = ct)
 Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -9]
-Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -21]
 
 # TIFF HK correlation
 tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
-chart.Correlation(Cor_ct_gene_HK_e[, 7:21], histogram=FALSE, pch=19, method = c("spearman"))
+chart.Correlation(Cor_ct_gene_HK[, 6:18], histogram=FALSE, pch=19, method = c("spearman"))
 mtext("Correlacion expresión de genes Riñon (CT)", side=3, line=3)
 # Close device
 dev.off()
+
 
 Cor_ct_gene_M_e <- CT_gene_e %>% filter(Tissue == "Muscule") %>% spread(key = Gene, value = ct)
 Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -10]
