@@ -20,4 +20,4 @@ b) Base de datos descriptiva de cuantificación y absorbancia de RNA de organos 
 | Variable de estudios| Varibales descriptivas| N° total observaciones|
 |-----------|-----------|-------------|
 |Concentracion de RNA| Músculo, Branquias, Riñon anterior, Bazo| 600 muestras|
-| Absorbancia (260/280)| Músculo, Branquias, Riñon anterior| Bazo| 600 muestras|
+| Absorbancia (260/280)| Músculo, Branquias, Riñon anterior, Bazo| 600 muestras|
