@@ -6,11 +6,7 @@ affiliation: Pontificia Universidad Católica de Valparaíso.
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
   pdf_document: default
-  word_document: default
-  html_document:
-    toc: true
-    toc_float: true
-    toc_depth: 3
+ 
 ---
 
 ```{r setup, include=FALSE}
@@ -220,7 +216,7 @@ RNA_pool_e$Treatment<-as.factor(RNA_pool_e$Treatment)
 RNA_pool_e$Tissue<-as.factor(RNA_pool_e$Tissue)
 RNA_pool_e$Time<-as.factor(RNA_pool_e$Time)
 RNA_pool_e$`Pool RNA (ng/µl)`<-as.numeric(RNA_pool_e$`Pool RNA (ng/µl)`)
-RNA_pool_e$`Pool A260/A280`<-as.numeric(RNA_pool_e$`Pool A260/A280`)
+RNA_pool_e$`Individual absorbance`<-as.numeric(RNA_pool_e$`Individual absorbance`)
 
 
 colnames(RNA_pool_e)[7] <- "Individual absorbance"
@@ -466,12 +462,17 @@ dev.off()
 ## ct gene correlation
 
 ```{r, warning=FALSE}
+```
+
+
+```{r, warning=FALSE}
 Cor_ct_gene_HK_e <- CT_gene_e %>% filter(Tissue == "Head kidney") %>% spread(key = Gene, value = ct)
+Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -9]
 Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -9]
 
 # TIFF HK correlation
 tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
-chart.Correlation(Cor_ct_gene_HK[, 6:18], histogram=FALSE, pch=19, method = c("spearman"))
+chart.Correlation(Cor_ct_gene_HK_e[,6:18], histogram=FALSE,pch=18, method = c("spearman")) 
 mtext("Correlacion expresión de genes Riñon (CT)", side=3, line=3)
 # Close device
 dev.off()
@@ -479,55 +480,39 @@ dev.off()
 
 Cor_ct_gene_M_e <- CT_gene_e %>% filter(Tissue == "Muscule") %>% spread(key = Gene, value = ct)
 Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -10]
-Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -10]
-Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -10]
-Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -13]
-Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -16]
-Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -16]
-Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -16]
 
 
 # TIFF device
 tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
-chart.Correlation(Cor_ct_gene_M_e[, 7:16], histogram=FALSE, pch=19, method = c("spearman"))
+chart.Correlation(Cor_ct_gene_M_e[, 6:19], histogram=FALSE, pch=30, method = c("spearman"))
 mtext("Correlacion expresión de genes Músculo (CT)", side=3, line=3)
 # Close device
 dev.off()
 
 Cor_ct_gene_G_e <- CT_gene_e %>% filter(Tissue == "Gills") %>% spread(key = Gene, value = ct)
-Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -9]
-Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -9]
-Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -9]
-Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -9]
-Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -12]
-Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -15]
-Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -15]
+Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -10]
 
-# TIFF device
-tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
-chart.Correlation(Cor_ct_gene_G_e[, 7:16], histogram=FALSE, pch=19, method = c("spearman"))
+
+# tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+chart.Correlation(Cor_ct_gene_G_e[, 6:14], histogram=FALSE, pch=19, method = c("spearman"))
 mtext("Correlacion expresión de genes Branquia (CT)", side=3, line=3)
 # Close device
 dev.off()
 
 Cor_ct_gene_S_e <- CT_gene_e %>% filter(Tissue == "Spleen") %>% spread(key = Gene, value = ct)
 Cor_ct_gene_S_e <- Cor_ct_gene_S_e[, -9]
-Cor_ct_gene_S_e <- Cor_ct_gene_S_e[, -21]
+
 
 # TIFF device
 tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
-chart.Correlation(Cor_ct_gene_S_e[, 7:21], histogram=FALSE, pch=19, method = c("spearman"))
+chart.Correlation(Cor_ct_gene_S_e[, 6:19], histogram=FALSE, pch=19, method = c("spearman"))
 mtext("Correlacion expresión de genes Bazo (CT)", side=3, line=3)
 # Close device
 dev.off()
 
-```
-
-## Exploratory ct gene REDUCED 
-
-```{r}
 
 ```
+
 
 
 
