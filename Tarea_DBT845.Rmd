@@ -633,7 +633,7 @@ mtext("Correlacion expresión de genes Riñon reducido (CT)", side=3, line=3)
 ```{r}
 stat.test <- ct_gene_HK_reduced %>%
   group_by(Gene) %>%
-  wilcox_test(ct ~ Time, ref.group = "0") %>% add_significance()
+  wilcox_test(ct ~ Time, ref.group = "1") %>% add_significance()
 stat.test
 
 # Box plots with p-values
@@ -651,6 +651,27 @@ ggboxplot(ct_gene_HK_reduced, x = "Time", y = "ct", fill = "steelblue", facet.by
 dev.off()
 
 
+```
+
+
+## PCA ct gene
+```{r, warning=FALSE}
+PCA_ct_gene_HK <- Cor_ct_gene_HK_e
+head(PCA_ct_gene_HK)
+pca <- prcomp(PCA_ct_gene_HK[, 6:18])
+biplot(x = pca, scale = 0, cex = 0.7, col = c("blue4", "brown3"))
+
+# Cálculo de la varianza explicada acumulada 
+prop_varianza <- pca$sdev^2/sum(pca$sdev^2)
+prop_varianza_acum <- cumsum(prop_varianza)
+ggplot(data = data.frame(prop_varianza_acum, pc = factor(1:15)),
+       aes(x = pc, y = prop_varianza_acum, group = 1)) +
+  geom_point() +
+  geom_line() +
+  geom_label(aes(label = round(prop_varianza_acum,2))) +
+  theme_bw() +
+  labs(x = "Componentes principales", 
+       y = "Prop. varianza explicada acumulada")
 ```
 
 
