@@ -462,8 +462,57 @@ dev.off()
 ## ct gene correlation
 
 ```{r, warning=FALSE}
+Cor_ct_gene_HK_e <- CT_gene_e %>% filter(Tissue == "Head kidney") %>% spread(key = Gene, value = ct)
+Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -9]
+Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -9]
+
+# TIFF HK correlation
+tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+chart.Correlation(Cor_ct_gene_HK_e[,6:18], histogram=FALSE,pch=18, method = c("spearman")) 
+mtext("Correlacion expresión de genes Riñon (CT)", side=3, line=3)
+# Close device
+dev.off()
 ```
 
+```{r}
+Cor_ct_gene_M_e <- CT_gene_e %>% filter(Tissue == "Muscule") %>% spread(key = Gene, value = ct)
+Cor_ct_gene_M_e <- Cor_ct_gene_M_e[, -10]
+
+
+# TIFF device
+tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+chart.Correlation(Cor_ct_gene_M_e[, 6:19], histogram=FALSE, pch=30, method = c("spearman"))
+mtext("Correlacion expresión de genes Músculo (CT)", side=3, line=3)
+# Close device
+dev.off()
+```
+
+```{r}
+Cor_ct_gene_G_e <- CT_gene_e %>% filter(Tissue == "Gills") %>% spread(key = Gene, value = ct)
+Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -10]
+
+
+# tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+chart.Correlation(Cor_ct_gene_G_e[, 6:14], histogram=FALSE, pch=19, method = c("spearman"))
+mtext("Correlacion expresión de genes Branquia (CT)", side=3, line=3)
+# Close device
+dev.off()
+
+```
+
+
+```{r}
+Cor_ct_gene_S_e <- CT_gene_e %>% filter(Tissue == "Spleen") %>% spread(key = Gene, value = ct)
+Cor_ct_gene_S_e <- Cor_ct_gene_S_e[, -9]
+
+
+# TIFF device
+tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+chart.Correlation(Cor_ct_gene_S_e[, 6:19], histogram=FALSE, pch=19, method = c("spearman"))
+mtext("Correlacion expresión de genes Bazo (CT)", side=3, line=3)
+# Close device
+dev.off()
+```
 
 ```{r, warning=FALSE}
 Cor_ct_gene_HK_e <- CT_gene_e %>% filter(Tissue == "Head kidney") %>% spread(key = Gene, value = ct)
@@ -512,15 +561,96 @@ dev.off()
 
 
 ```
+## Exploratory ct gene REDUCED 
+
+```{r correlatio_plot_reduced}
+ct_gene_HK_reduced <- ct_gene_HK_e[ct_gene_HK_e$Gene %in% c("Pool","Program","Treatment","Tissue","Time","Anexina 1", "mhcii","cd4","eomes","tnf","ifn","il10","il12","il1b","inos", "mhci","cd8", "TGFb","tnf" ), ] 
+
+ct_gene_HK_reduced$Gene <- as.factor(ct_gene_HK_reduced$Gene)
+ 
+tiff("Gene expression HK.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+ct_gene_HK_reduced %>% ggplot(aes(x=Time, y= ct))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")+
+  labs(subtitle="CT by gene - HK")
+dev.off()
+```
+
+
+```{r correlatio_plot_reduced}
+tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+chart.Correlation(Cor_ct_gene_HK_e[, c( "mhcii","cd4","eomes","tnf","ifn","il10","il12","il1b","inos", "mhci","cd8", "TGFb","tnf")], histogram=FALSE, pch=19, method = c("spearman"))
+mtext("Correlacion expresión de genes Riñon reducido (CT)", side=3, line=3)
+# Close device
+dev.off()
+```
+
+
+```{r correlatio_plot_reduced}
+HK_cor <-cor(Cor_ct_gene_HK_e[,c( "mhcii","cd4","eomes","tnf","ifn","il10","il12","il1b","inos", "mhci","cd8", "TGFb","tnf")])
 
 
 
 
+cor.mtest <- function(mat, ...) {
+    mat <- as.matrix(mat)
+    n <- ncol(mat)
+    p.mat<- matrix(NA, n, n)
+    diag(p.mat) <- 0
+    for (i in 1:(n - 1)) {
+        for (j in (i + 1):n) {
+            tmp <- cor.test(mat[, i], mat[, j], ...)
+            p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+        }
+    }
+  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+  p.mat
+}
+
+#matrix of the p-value of the correlation
+#p.mat <- cor.mtest(mat)
+#head(p.mat[, 1:5])
 
 
+png("Correlation_plot_HK.png", width = 5, height = 4, units = 'in', res = 300)
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+corrplot(HK_cor, method="color", col=col(200),  
+         type="upper", order="original", 
+         addCoef.col = "black", # Add coefficient of correlation
+         tl.col="black", tl.srt=0, #Text label color and rotation
+        diag=FALSE 
+         )
+dev.off()
 
 
+chart.Correlation(Cor_ct_gene_HK_e[, c( "mhcii","cd4","eomes","tnf","ifn","il10","il12","il1b","inos", "mhci","cd8", "TGFb","tnf")], histogram=FALSE, pch=19, method = c("spearman"))
+mtext("Correlacion expresión de genes Riñon reducido (CT)", side=3, line=3)
 
 
+```
+
+
+```{r}
+stat.test <- ct_gene_HK_reduced %>%
+  group_by(Gene) %>%
+  wilcox_test(ct ~ Time, ref.group = "0") %>% add_significance()
+stat.test
+
+# Box plots with p-values
+stat.test <- stat.test %>% add_xy_position(x="Time")
+tiff("Gene_expression_HK.tiff", units="in", width=8, height=5, res=300, compression = 'lzw')
+ggboxplot(ct_gene_HK_reduced, x = "Time", y = "ct", fill = "steelblue", facet.by = "Gene", scales = "free", add = "jitter", add.params = list(size = 0.9, jitter = 0.2)) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", tip.length = 0.05, hide.ns=T, color = "red")+
+  scale_y_continuous(expand = expansion(mult = c(0.20, 0.15)))
+dev.off()
+
+png("Gene_expression_HK.png", width = 8, height = 4, units = 'in', res = 300)
+ggboxplot(ct_gene_HK_reduced, x = "Time", y = "ct", fill = "steelblue", facet.by = "Gene", scales = "free", add = "jitter", add.params = list(size = 0.8, jitter = 0.1)) +
+  stat_pvalue_manual(stat.test, label = "p.adj.signif", tip.length = 0.05, hide.ns=T, color = "red")+
+  scale_y_continuous(expand = expansion(mult = c(0.20, 0.15)))
+dev.off()
+
+
+```
 
 
