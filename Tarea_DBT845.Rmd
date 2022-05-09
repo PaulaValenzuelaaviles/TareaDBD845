@@ -459,9 +459,25 @@ grid.arrange(A)
 dev.off()
 ```
 
+#Head Kidney (analisis estadistico) 
+
+```{r}
+ct_gene_HK_e <- CT_gene_e %>% filter(Tissue == "Head kidney")
+ct_gene_HK_e %>% ggplot(aes(x=Time, y= ct))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")+
+  labs(subtitle="CT by gene - HK")
+
+ct_gene_HK_e$Gene <- as.factor(ct_gene_HK_e$Gene)
+
+
+```
+
+
+
 ## ct gene correlation
 
-```{r, warning=FALSE}
+```{r, warning=TRUE}
 Cor_ct_gene_HK_e <- CT_gene_e %>% filter(Tissue == "Head kidney") %>% spread(key = Gene, value = ct)
 Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -9]
 Cor_ct_gene_HK_e <- Cor_ct_gene_HK_e[, -9]
@@ -542,7 +558,7 @@ Cor_ct_gene_G_e <- CT_gene_e %>% filter(Tissue == "Gills") %>% spread(key = Gene
 Cor_ct_gene_G_e <- Cor_ct_gene_G_e[, -10]
 
 
-# tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+tiff("Correlation plot.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
 chart.Correlation(Cor_ct_gene_G_e[, 6:14], histogram=FALSE, pch=19, method = c("spearman"))
 mtext("Correlacion expresión de genes Branquia (CT)", side=3, line=3)
 # Close device
@@ -569,6 +585,7 @@ ct_gene_HK_reduced <- ct_gene_HK_e[ct_gene_HK_e$Gene %in% c("Pool","Program","Tr
 ct_gene_HK_reduced$Gene <- as.factor(ct_gene_HK_reduced$Gene)
  
 tiff("Gene expression HK.tiff", units="in", width=5, height=4, res=300, compression = 'lzw')
+
 ct_gene_HK_reduced %>% ggplot(aes(x=Time, y= ct))+
   geom_boxplot(color="darkblue", fill="lightblue")+
   facet_wrap(~ Gene,scales = "free")+
@@ -587,7 +604,7 @@ dev.off()
 
 
 ```{r correlatio_plot_reduced}
-HK_cor <-cor(Cor_ct_gene_HK_e[,c( "mhcii","cd4","eomes","tnf","ifn","il10","il12","il1b","inos", "mhci","cd8", "TGFb","tnf")])
+HK_cor <-cor(Cor_ct_gene_HK_e[,c("anexina 1", "mhcii","cd4","eomes","tnf","ifn","il10","il12","il1b","inos", "mhci","cd8", "TGFb","tnf")])
 
 
 
@@ -623,7 +640,7 @@ corrplot(HK_cor, method="color", col=col(200),
 dev.off()
 
 
-chart.Correlation(Cor_ct_gene_HK_e[, c( "mhcii","cd4","eomes","tnf","ifn","il10","il12","il1b","inos", "mhci","cd8", "TGFb","tnf")], histogram=FALSE, pch=19, method = c("spearman"))
+chart.Correlation(Cor_ct_gene_HK_e[, c("anexina 1", "mhcii","cd4","eomes","tnf","ifn","il10","il12","il1b","inos", "mhci","cd8", "TGFb","tnf")], histogram=FALSE, pch=19, method = c("spearman"))
 mtext("Correlacion expresión de genes Riñon reducido (CT)", side=3, line=3)
 
 
@@ -664,7 +681,7 @@ biplot(x = pca, scale = 0, cex = 0.7, col = c("blue4", "brown3"))
 # Cálculo de la varianza explicada acumulada 
 prop_varianza <- pca$sdev^2/sum(pca$sdev^2)
 prop_varianza_acum <- cumsum(prop_varianza)
-ggplot(data = data.frame(prop_varianza_acum, pc = factor(1:15)),
+ggplot(data = data.frame(prop_varianza_acum, pc = factor(1:13)),
        aes(x = pc, y = prop_varianza_acum, group = 1)) +
   geom_point() +
   geom_line() +
@@ -673,5 +690,113 @@ ggplot(data = data.frame(prop_varianza_acum, pc = factor(1:15)),
   labs(x = "Componentes principales", 
        y = "Prop. varianza explicada acumulada")
 ```
+# Delta ct calibrador by Tissue
+# Intento de Iterar Delta ct calibrador.
+# Aun no funciona - no Run
+```{r}
+Calibrador_HK_e <- CT_gene_e %>% filter(Tissue == "Head kidney")  %>% group_by(Gene) %>% summarize(media_ref=mean(ct),media_target=mean(ct),Delta_calibrador=media_target-media_ref, .groups = 'drop')
 
+Calibrador_M_e <- CT_gene_e %>% filter(Tissue == "Muscule")  %>% group_by(Gene) %>% summarize(media_ref=mean(ct),media_target=mean(ct),Delta_calibrador=media_target-media_ref, .groups = 'drop')
+
+
+Calibrador_G_e <- CT_gene_e %>% filter(Tissue == "Gills")  %>% group_by(Gene) %>% summarize(media_ref=mean(ct),media_target=mean(ct),Delta_calibrador=media_target-media_ref, .groups = 'drop')
+
+Calibrador_S_e <- CT_gene_e %>% filter(Tissue == "Spleen")  %>% group_by(Gene) %>% summarize(media_ref=mean(ct),media_target=mean(ct),Delta_calibrador=media_target-media_ref, .groups = 'drop')
+
+
+Calibrador_HK_e
+Calibrador_M_e
+Calibrador_G_e
+Calibrador_S_e
+
+ggplot(Calibrador_HK_e, aes(x= Delta_calibrador))+
+  geom_histogram(color="darkblue", fill="lightblue", bins=10)+
+  labs(y="Delta calibrador", x="Count", 
+       subtitle="Delta_calibrador HK")
+
+ggplot(Calibrador_M_e, aes(x= Delta_calibrador))+
+  geom_histogram(color="darkblue", fill="lightblue", bins=10)+
+  labs(y="Delta calibrador", x="Count", 
+       subtitle=" Delta_calibrador M")
+
+ggplot(Calibrador_G_e, aes(x= Delta_calibrador))+
+  geom_histogram(color="darkblue", fill="lightblue", bins=10)+
+  labs(y="Delta calibrador", x="Count", 
+       subtitle=" Delta_calibrador Gills")
+
+ggplot(Calibrador_S_e, aes(x= Delta_calibrador))+
+  geom_histogram(color="darkblue", fill="lightblue", bins=10)+
+  labs(y="Delta calibrador", x="Count", 
+       subtitle=" Delta_calibrador Spleen")
+
+
+
+
+
+```
+# Calculo Delta ct test
+corregir valor Delta_tests porque solo sale el valor de ct, no elf
+
+```{r}
+Test_HK_e <- CT_gene_e %>% filter(Tissue == "Head kidney")  %>% mutate(Delta_test=ct)
+
+Test_HK_e
+
+Test_M_e <- CT_gene_e %>% filter(Tissue == "Muscle")  %>% mutate(Delta_test=ct-elf)
+
+Test_M
+
+Test_G <- CT_gene %>% filter(Tissue == "Gills")  %>% mutate(Delta_test=ct-elf)
+
+Test_G
+
+Test_S <- CT_gene %>% filter(Tissue == "Spleen")  %>% mutate(Delta_test=ct-(elf))
+
+Test_S
+
+ggplot(Test_HK, aes(x= Delta_test))+
+  geom_histogram(color="darkblue", fill="lightblue", bins=10)+
+  labs(y="Delta test", x="Count", 
+       subtitle="Delta test HK")
+
+ggplot(Test_M, aes(x= Delta_test))+
+  geom_histogram(color="darkblue", fill="lightblue", bins=10)+
+  labs(y="Delta test", x="Count", 
+       subtitle="Delta test M")
+
+ggplot(Test_G, aes(x= Delta_test))+
+  geom_histogram(color="darkblue", fill="lightblue", bins=10)+
+  labs(y="Delta test", x="Count", 
+       subtitle="Delta test Gills")
+
+ggplot(Test_S, aes(x= Delta_test))+
+  geom_histogram(color="darkblue", fill="lightblue", bins=10)+
+  labs(y="Delta test", x="Count", 
+       subtitle="Delta test Spleen")
+
+
+ggplot(Test_HK, aes(x=Time, y= Delta_test))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")+
+  labs(subtitle="Delta test HK")
+
+ggplot(Test_M, aes(x=Time, y= Delta_test))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")+
+  labs(subtitle="Delta test M")
+
+ggplot(Test_G, aes(x=Time, y= Delta_test))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")+
+  labs(subtitle="Delta test Gills")
+
+ggplot(Test_S, aes(x=Time, y= Delta_test))+
+  geom_boxplot(color="darkblue", fill="lightblue")+
+  facet_wrap(~ Gene,scales = "free")+
+  labs(subtitle="Delta test Spleen")
+
+```
+
+
+```{r, warning=FALSE}
 
